@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css" />
+  <style>
+    header {
+      margin: 0;
+      display: flex;
+      background-color: black;
+      color: azure;
+
+    }
+
+    body {
+      margin: 0;
+    }
+
+    .button {
+      border: 0;
+      background-color: rgb(0, 0, 0);
+      color: rgb(255, 255, 255);
+      height: 32.5px;
+      width: 50px;
+    }
+
+    .text {
+      background-color: rgb(255, 255, 255);
+      border: rgb(169, 169, 169) solid 1px;
+      height: 20px;
+      padding: 5px;
+      width: 78%;
+      flex-grow: 1;
+    }
+
+    .owner {
+      padding: 10px;
+      margin: 0px;
+      text-align: left;
+
+    }
+
+    .mine {
+      text-align: right;
+    }
+
+    .other {
+      text-align: left;
+    }
+
+    .img {
+      width: 200px;
+    }
+
+    .alarm {
+      padding-top: 5px;
+      padding-bottom: 5px;
+      padding-left: 30px;
+      padding-right: 30px;
+      margin: auto;
+      background-color: #eeeeee;
+      border-radius: 30px;
+      display: inline;
+    }
+
+    #log {
+      overflow-y: auto;
+      height: 400px;
+    }
+
+    #attach {
+      display: none;
+    }
+
+    .file {
+      padding-left: 10px;
+      padding-right: 10px;
+      padding-top: 3px;
+      padding-bottom: 3px;
+      border-radius: 30px;
+      border: 1px;
+    }
+
+    .exit {
+      position: absolute;
+      top: 3.5%;
+      right: 10%;
+      color: rgb(254, 249, 249);
+      background-color: black;
+      padding: 0;
+      border: 0px;
+    }
+
+    .submitWrap {
+      display: flex;
+      margin: 4px;
+    }
+
+    .chattingRoom {
+      margin: 10% auto 0;
+      padding: 0 10% 20px;
+    }
+
+    .chatting {
+      color: rgb(255, 255, 255);
+      display: inline-block;
+      padding-bottom: 3px;
+      padding-top: 3px;
+      padding-left: 10px;
+      padding-right: 10px;
+      border-radius: 7px;
+      background-color: rgb(27, 28, 86);
+      border: 0px;
+      font-size: 14px;
+    }
+
+    .talker {
+      font-weight: bold;
+    }
+
+    .box {
+      margin: 3px;
+    }
+  </style>
+  <title>chat-room</title>
+</head>
+
+<body>
+
+  <header>
+    <h1> <i class="far fa-comments"> <%=room.title%></i>
+      <span class="exit"><a href="/chats/exit?id=<%=room._id%>"><button class="exit"><i class="fas fa-door-open fa-2x"></i></button></a></span>
+    </h1>
+  </header>
+
+  <section class="chattingRoom">
+    <div class="owner">
+      방장: <%=room.owner??"개설자없음"%>
+      <small> 참여자: <%room.joiners.forEach((elm)=>{%></small>
+      <span id="joiner"> <%=elm.joiner%></span>
+      <%})%>
+      <span class="date"><%=room.createdAt.toLocaleDateString()%></span>
+    </div>
+
+
+    <div id="log">
+      <%chatting.forEach((elm)=>{%>
+      <div class="<%=elm.type%>">
+        <div class="box">
+          <%if(elm.type=="other"){%>
+          <div class="talker"><%=elm.talker%></div>
+          <%}%>
+        <%if(elm.type=="mine"){%>
+          <span class="chat"><small><%=elm.createdAt.toLocaleTimeString()%></small></span>
+          <%if(elm.data=="chat"){%>
+          <span class="chatting"><%=elm.content%></span>
+          <%}else{%>
+          <img src="<%=elm.content%>" class="img" />
+          <%}%>
+        <%}else{%>
+          <%if(elm.data=="chat"){%>
+          <span class="chatting"><%=elm.content%></span>
+          <%}else{%>
+          <img src="<%=elm.content%>" class="img" />
+          <%}%>
+        <span class="chat"><small><%=elm.createdAt.toLocaleTimeString()%></small></span>
+          <%}%>
+    </div>
+    </div>
+    <%})%>
+
+        </div>
+
+
+
+
+        <div class="submitWrap">
+
+          <label for="attach" class="file"><i class="fas fa-plus"></i></label><input type="file" name="ev_display" id="attach" class="file-input" accept="image/*" data-room-id="<%=room._id%>" />
+          <input type="text" name="chat" class="text" placeholder="입력" id="msg" data-room-id="<%=room._id%>">
+          <button type="submit" class="button"><i class="fas fa-arrow-up"></i></button>
+        </div>
+
+
+  </section>
+
+
+
+  <script>
+    const roomId = document.querySelector("#msg").dataset.roomId
+
+    document.querySelector("#attach").onchange = async (evt) => {
+      console.log(evt.target.files[0])
+
+      //ajax로 전송해줘야함.
+      //post+multipart/form-data로 요청을 보내야 전송이 됨.
+      //multipart용 바디는 FormData라는 객체를 사용하면 된다.
+      //FormData를 해주면 content type설정을 따로 안해줘도 된다.
+
+      const body = new FormData();
+      body.append("attach", evt.target.files[0]);
+      body.append("roomId", evt.target.dataset.roomId);
+      console.log(evt.target.dataset.roomId)
+      let response = await fetch("/chats/api/upload?roomId=" + evt.target.dataset.roomId, {
+        method: "post",
+        body: body
+      });
+
+      let json = response.json();
+      console.log(json)
+    }
+
+    const ws = new WebSocket(`ws://${location.host}/chats/rooms?id=${roomId}`);
+
+    ws.onmessage = function(rst) {
+      let msg = JSON.parse(rst.data);
+
+      if (msg.apply !== roomId) {
+        return;
+      }
+
+      let div = document.createElement("div")
+      switch (msg.type) {
+
+        case "exit":
+          div.appendChild(document.createTextNode(msg.id + "님이 퇴장하였습니다."));
+          div.classList.add("alarm");
+
+          document.querySelector("#log").appendChild(div);
+          break;
+
+
+        case "join":
+          div.appendChild(document.createTextNode(msg.id + "님이 입장하였습니다."));
+          div.classList.add("alarm");
+
+          document.querySelector("#log").appendChild(div);
+          break;
+
+        case "new":
+          if (msg.data.data === "chat") {
+            content = msg.data.content
+          } else {
+            content = `<img src="${msg.data.content}" class="img"/>`
+          }
+
+          let html = `
+        <div class="${msg.data.type}">
+        
+        <div class="box">
+        <span class="chat"><small>${new Date(msg.data.createdAt).toLocaleTimeString()}</small></span>
+        
+        <span class="chatting">${content}</span>
+
+        </div>  
+        </div>`
+
+
+          document.querySelector("#log").insertAdjacentHTML("beforeend", html)
+          break;
+
+      }
+
+      rebalanceHeight();
+    }
+
+
+    //websocket에서 send는 안하고 ajax로 해보자.
+    document.querySelector("#msg").onchange = (evt => {
+      if (evt.target.value.trim().length === 0) {
+        return;
+      }
+
+      const headers = {
+        "content-type": "application/json"
+      }
+
+      fetch("/chats/api/chatting", {
+        headers,
+        method: "post",
+        body: JSON.stringify({
+          roomId: evt.target.dataset.roomId,
+          content: evt.target.value
+        })
+      }).then(response => {
+        return response.json();
+      }).then(json => {
+        console.log(json);
+      }).catch(err => {
+        alert("서버와의 통신이 끊겼습니다.")
+      });
+
+      evt.target.value = "";
+    })
+
+
+    //스크롤 자동으로 정렬하기.
+    function rebalanceHeight() {
+      document.querySelector("#log").scrollTop =
+        document.querySelector("#log").scrollHeight;
+    };
+
+    rebalanceHeight();
+  </script>
+</body>
+
+</html>

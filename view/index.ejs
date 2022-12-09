@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css" />
+    <style>
+        body{
+            margin: 50px;
+            text-align: center;
+           
+        }
+        div{
+            margin:10px;
+        }
+        .text{
+            width: 200px;
+            height: 50px;
+            font-size: 15px;
+        }
+        button{
+            width: 200px;
+            height: 50px;
+            background-color: black;
+            color: rgb(255, 255, 255);
+            border-radius: 50px;
+            font-size: 15px;
+        }
+        .box{
+           
+            width: 600px;
+            height: 800px;
+            border: 2px black solid;
+        }
+    </style>
+    <title>Document</title>
+</head>
+<body>
+
+    <form action="/chats/open" method="post">
+    <div class="box">
+    <h1>채팅방 만들기</h1>
+    <div>채팅방 이름</div>
+    <div><input type="text" class="text" name="title" placeholder="채팅방 이름을 입력하세요"></div>
+    <div>공개<input type="radio" name="type" value="public">
+    비공개<input type="radio" name="type" value="private"></div>
+    <div><input type="password" class="text" name="password" id="password" placeholder="비밀번호를 입력하세요"></div>
+    <div><button type="submit" >채팅방 생성</button></div>
+    </div>
+    </form>
+    
+</body>
+</html>

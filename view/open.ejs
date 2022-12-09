@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Butcherman&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="mystyle.css">
+  <style>
+    header {
+      font-family: 'Butcherman', cursive;
+      text-align: center;
+    }
+
+    a {
+      text-decoration: none;
+      color: black;
+    }
+
+    .nav {
+      background-color: black;
+      color: white;
+      height: 50px;
+      border: 0px
+    }
+
+    .listWrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5%;
+      margin-top: 10px;
+    }
+
+    .list {
+      border-radius: 10px;
+      width: 25%;
+      min-width: 300px;
+      min-height: 100px;
+      background-color: rgb(219, 219, 219);
+      padding: 10px;
+      position: relative;
+      box-sizing: border-box;
+      margin: 5px;
+    }
+
+    .joinList {
+      height: 50px;
+      background-color: black;
+    }
+
+    .private {
+      position: absolute;
+      top: 13px;
+      left: 8px;
+      color: rgb(69, 69, 69);
+    }
+
+    .bomb {
+      position: absolute;
+      top: 13px;
+      right: 8px;
+      color: rgb(69, 69, 69);
+      border: 0;
+      background: 0;
+      padding: 0;
+    }
+
+    .setting {
+      position: absolute;
+      right: 5px;
+    }
+
+    .roomTitle {
+      margin-left: 1cm;
+      margin-top: 2px;
+      margin-bottom: 2px;
+      display: inline-block;
+    }
+
+    .joiner {
+      margin: 3px;
+      color: grey;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .boss {
+      font-weight: bold;
+      margin-left: 1cm;
+      margin-top: 2px;
+    }
+  </style>
+  <title>chatting</title>
+</head>
+
+<body>
+  <header>
+
+    <h1><a href="/chats/open">Chatting Room list(<%=rooms.length%>)</a></h1>
+  </header>
+  <nav class="joinList">
+
+    <a href="/chats/join"><button class="nav">참여방 목록가기</button></a>
+    <a href="/chats/not"><button class="nav">참여하지 않은 방 목록가기</button></a>
+    <span class="setting">
+      <a href="/chats"><button class="nav">채팅방개설</button></a>
+      <a href="/account/signin"><button class="nav">로그인</button></a>
+
+    </span>
+  </nav>
+  <div class="listWrap">
+    <%rooms.forEach((elm)=>{%>
+    <div class="list">
+      <span><label>
+          <h4 class="roomTitle" onclick="entrance(event)" data-password="<%=elm.password%>" data-type="<%=elm.type%>" data-room-id=<%=elm._id%>><%=elm.title??"제목없음"%></h4></span><span class="joiner"><%=elm.joiners.length%></span></label>
+      <div></div>
+
+
+
+      <span class="boss"><%=elm.owner??"--"%></span>
+      <span class="joiner"><%elm.joiners.forEach((one)=>{%>
+        <%=one.joiner%>
+        <%})%></span>
+
+
+      <%if(elm.type == "private"){%>
+      <div class="private"><i class="far fa-dizzy fa-2x"></i></div>
+      <%}else{%>
+      <div class="private"><i class="far fa-smile fa-2x"></i></div>
+      <%}%>
+      
+<%if(elm.owner == userId ){%>
+      <a href="/chats/delete?id=<%=elm._id%>">
+
+        <button class="bomb"><i class="fas fa-bomb fa-2x"></i></button>
+      </a>
+      <%} %>
+
+      <%= elm.vrTargetCd?.content %>
+    </div>
+    <%})%>
+  </div>
+
+  <script>
+    const ws = new WebSocket("ws://" + location.host + "/chats/sse");
+
+    ws.onmessage = function(recv) {
+      //console.log(recv);
+      let message = JSON.parse(recv.data);
+      switch (message.type) {
+        case "new":
+          if (confirm("새로 개설된 채팅방이 있습니다.")) {
+            location.reload();
+          }
+          break;
+      }
+    }
+
+
+    function entrance(evt) {
+      let passWord = evt.target.dataset.password;
+      let type = evt.target.dataset.type;
+      let roomId = evt.target.dataset.roomId
+
+
+      if (type == "private") {
+        let pass = prompt("비밀번호를 입력하세요.")
+
+        if (pass === passWord) {
+          return location.href = `/chats/rooms?id=${roomId}`
+        } else {
+          return alert("다시 입력하세요.")
+          //서브밋 버튼 누르기 취소하기.
+        }
+
+      } else {
+        return location.href = `/chats/rooms?id=${roomId}`
+      }
+      console.log(evt.target.dataset.type)
+    }
+  </script>
+
+</body>
+
+</html>
